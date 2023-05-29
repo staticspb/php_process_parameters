@@ -38,3 +38,34 @@ This is a small library to simplify parameters and headers validation.
 ```
 $ curl example/index.php?email=some@email.com&age=18&height=11.5&active=false&features=red,green,blue&config={"body": {"key": "value"}}
 ```
+
+## Response Example
+```
+{
+  "result": 200,
+  "body": {
+    "processed_parameters": {
+      "email": "some@email.com",
+      "age": 18,
+      "active": true,
+      "height": 11.5,
+      "features": [
+        "red",
+        "green",
+        "blue"
+      ],
+      "config": {
+        "body": {
+          "key": "value"
+        }
+      },
+      "nonce": 0
+    },
+    "processed_headers": {
+      "Accept-Language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7,az;q=0.6",
+      "Connection": "keep-alive",
+      "Authorization": ""
+    }
+  }
+}
+```
