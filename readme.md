@@ -22,6 +22,7 @@ This is a small library to simplify parameters and headers validation.
 |boolean|Boolean|true|
 |array|Array|one,two,three|
 |json|JSON|{"foo": "bar"}|
+|file|File|... **Only for "POST" requests**|
 
 ### Available options for parameters and hearers
 |Name|Type|Description|
