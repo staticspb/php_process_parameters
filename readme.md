@@ -10,6 +10,7 @@ This is a small library to simplify parameters and headers validation.
 |error_response_root|error|Root data element for error response|
 |array_delimiter|,|Array delimiter for parameters|
 |use_post_method|false|Set to "true" to use POST request method|
+|response_headers|–|Array with headers to add to response|
 |parameters|...|List of parameters for validation and processing|
 |headers|...|List of HTTP headers for validation and processing|
 

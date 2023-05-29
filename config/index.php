@@ -1,11 +1,16 @@
 <?php
 $config = array(
-	"result_code_root" => "result", /* Element for result code in response */
-	"successful_response_root" => "body", /* Root data element for successful response */
-	"error_response_root" => "error", /* Root data element for error response */
-	"array_delimiter" => ",", /* Array delimiter for parameters */
-	"use_post_method" => false, /* Set to "true" to use POST request method */
-
+	"result_code_root" => "result", 		/* Element for result code in response */
+	"successful_response_root" => "body",	/* Root data element for successful response */
+	"error_response_root" => "error",		/* Root data element for error response */
+	"array_delimiter" => ",",				/* Array delimiter for parameters */
+	"use_post_method" => false,				/* Set to "true" to use POST request method */
+	"response_headers" => [					/* Array with headers to add to response */
+		"Content-Type: application/json",
+		"Access-Control-Allow-Origin: *",
+		"Access-Control-Allow-Methods: GET",
+		"Access-Control-Allow-Headers: Content-Type",
+	],
 	"parameters" => [ /* List of parameters for validation and processing */
 		"email" => [
 			"type" => "string",

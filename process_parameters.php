@@ -29,17 +29,16 @@ define("PARAM_REGEX", "regex");
 define("PARAM_ARRAY_DELIMITER", "array_delimiter");
 
 // Add required headers to output
-function addHeader($code) {
+function addHeader($code, $config) {
 	http_response_code($code);
-	header('Content-Type: application/json');
-	header('Access-Control-Allow-Origin: *');
-	header('Access-Control-Allow-Methods: GET');
-	header('Access-Control-Allow-Headers: Content-Type');
+	for ($i=0; $i<count($config["response_headers"]); $i++) {
+		header($config["response_headers"][$i]);
+	}
 }
 
 // Render response
 function renderResponse($code, $rootName, $rootValue, $config) {
-	addHeader($code);
+	addHeader($code, $config);
 
 	echo json_encode(
 		array(
@@ -89,6 +88,11 @@ function returnErrorWrongHeaderType($header, $config) {
 // Render wrong header configuration error
 function returnErrorWrongHeaderConfiguration($header, $config) {
 	returnError(400, "Wrong header configuration: $header", $config);
+}
+
+// Render internal server error
+function returnInternalServerError($config) {
+	returnError(500, "Internal server error", $config);
 }
 
 // Get request parameter by name
@@ -201,6 +205,7 @@ function processRequestParameters($config) {
 			}
 
 			if ($type == TYPE_FILE) {
+				/* Nothing here */
 			}
 			
 			switch (strtolower($type)) {
@@ -240,7 +245,7 @@ function processRequestParameters($config) {
 		}
 
 	} catch (Exception $e) {
-		returnError(500, "Internal server error", $config);
+		returnInternalServerError($config);
 	}
 	
 	return $result;
@@ -347,7 +352,7 @@ function processRequestHeaders($config) {
 		}
 
 	} catch (Exception $e) {
-		returnError(500, "Internal server error", $config);
+		returnInternalServerError($config);
 	}
 	
 	return $result;

@@ -12,6 +12,6 @@ try {
 	returnResult(["processed_parameters" => $parameters, "processed_headers" => $headers], $config);
 
 } catch (Exception $e) {
-	returnError(500, "Internal server error", $config);
+	returnInternalServerError($config);
 }
 ?>
