@@ -44,6 +44,22 @@ $config = array(
 			"type" => "integer",
 			"is_required" => false
 		]
+	],
+	"headers" => [
+		"accept-language" => [
+			"type" => "string",
+			"is_required" => true
+		],
+		"connection" => [
+			"type" => "string",
+			"regex" => "/^keep-alive$/",
+			"is_required" => true
+		]
+		/*"authorization" => [
+			"type" => "string",
+			"regex" => "/Bearier\s[a-f0-9-]{1,}$/",
+			"is_required" => true
+		]*/
 	]
 )
 ?>
