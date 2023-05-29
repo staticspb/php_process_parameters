@@ -46,20 +46,20 @@ $config = array(
 		]
 	],
 	"headers" => [
-		"accept-language" => [
+		"Accept-Language" => [
 			"type" => "string",
-			"is_required" => true
+			"is_required" => false
 		],
-		"connection" => [
+		"Connection" => [
 			"type" => "string",
 			"regex" => "/^keep-alive$/",
-			"is_required" => true
-		]
-		/*"authorization" => [
+			"is_required" => false
+		],
+		"Authorization" => [
 			"type" => "string",
-			"regex" => "/Bearier\s[a-f0-9-]{1,}$/",
-			"is_required" => true
-		]*/
+			"regex" => "/^Bearer [A-Za-z0-9-_]{32}$/",
+			"is_required" => false
+		]
 	]
 )
 ?>
