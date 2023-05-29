@@ -1,7 +1,7 @@
 <?php
 $config = array(
 	"result_code_root" => "result", /* Element for result code in response */
-	"successful_response_root" => "body", /* Root data element for succesful response */
+	"successful_response_root" => "body", /* Root data element for successful response */
 	"error_response_root" => "error", /* Root data element for error response */
 	"array_delimiter" => ",", /* Array delimiter for parameters */
 	"use_post_method" => false, /* Set to "true" to use POST request method */
