@@ -343,7 +343,7 @@ function processRequestHeaders($config) {
 					returnErrorWrongHeaderConfiguration($header, $config);
 			}
 
-			$result[strtolower($header)] = $value;
+			$result[$header] = $value;
 		}
 
 	} catch (Exception $e) {
