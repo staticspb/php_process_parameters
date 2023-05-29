@@ -6,7 +6,7 @@ $config = array(
 	"array_delimiter" => ",", /* Array delimiter for parameters */
 	"use_post_method" => false, /* Set to "true" to use POST request method */
 
-	"parameters" => [ /* Request parameters names and storage variables */
+	"parameters" => [ /* List of parameters for validation and processing */
 		"email" => [
 			"type" => "string",
 			"min" => 5,
@@ -45,7 +45,7 @@ $config = array(
 			"is_required" => false
 		]
 	],
-	"headers" => [
+	"headers" => [ /* List of HTTP headers for validation and processing */
 		"Accept-Language" => [
 			"type" => "string",
 			"is_required" => false
