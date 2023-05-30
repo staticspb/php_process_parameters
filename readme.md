@@ -29,6 +29,7 @@ This is a small library to simplify parameters and headers validation.
 |Name|Type|Description|
 |---|---|---|
 |is_required|Boolean|Creates a required parameter
+|default|Any Type|Set default value for parameter or header
 |min|Integer or Float|Minimal value for "integer" or "float" types, minimal string length for "string" type or array length for "array" type|
 |max|Integer or Float|Maximal value for "integer" or "float" types, maximal string length for "string" type or array length for "array" type|
 |regex|String|**Only for "string" type**: RegEx expressions to validate parameter value
@@ -64,7 +65,7 @@ $ curl example/index.php?email=some@email.com&age=18&height=11.5&active=false&fe
     "processed_headers": {
       "Accept-Language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7,az;q=0.6",
       "Connection": "keep-alive",
-      "Authorization": ""
+      "Authorization": "Bearer 76d80224611fc919a5d54f0ff9fba446"
     }
   }
 }

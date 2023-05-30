@@ -63,7 +63,8 @@ $config = array(
 		"Authorization" => [
 			"type" => "string",
 			"regex" => "/^Bearer [A-Za-z0-9-_]{32}$/",
-			"is_required" => false
+			"is_required" => false,
+			"default" => "Bearer 76d80224611fc919a5d54f0ff9fba446"
 		]
 	]
 )

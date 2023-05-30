@@ -22,6 +22,7 @@ define("PARAM_PARAMETERS", "parameters");
 define("PARAM_HEADERS", "headers");
 define("PARAM_USE_POST", "use_post_method");
 define("PARAM_TYPE", "type");
+define("PARAM_DEFAULT", "default");
 define("PARAM_IS_REQUIRED", "is_required");
 define("PARAM_MIN", "min");
 define("PARAM_MAX", "max");
@@ -109,6 +110,8 @@ function getParam($name, $isPost = false) {
 		}
 	}
 	
+	if (strlen($result) < 1) return false;
+	
 	return $result;
 }
 
@@ -121,6 +124,8 @@ function getHeader($name) {
 		$result = $_SERVER[$name];	
 	}
 	
+	if (strlen($result) < 1) return false;
+
 	return $result;
 }
 
@@ -137,7 +142,11 @@ function processRequestParameters($config) {
 	try {
 		foreach ($config[PARAM_PARAMETERS] as $parameter=>$options) {
 			$value = getParam($parameter, $config[PARAM_USE_POST]);
-			$type = strtolower($config[PARAM_PARAMETERS][$parameter][PARAM_TYPE]);
+			$type = strtolower($options[PARAM_TYPE]);
+
+			if ($value === false && $type != TYPE_FILE)
+				if (array_key_exists(PARAM_DEFAULT, $options))
+					$value = $options[PARAM_DEFAULT];
 
 			if (($value === false && $options[PARAM_IS_REQUIRED] == true) && $type != TYPE_FILE)
 				returnErrorMissingParameter($parameter, $config);
@@ -258,7 +267,11 @@ function processRequestHeaders($config) {
 	try {
 		foreach ($config[PARAM_HEADERS] as $header=>$options) {
 			$value = getHeader($header);
-			$type = strtolower($config[PARAM_HEADERS][$header][PARAM_TYPE]);
+			$type = strtolower($options[PARAM_TYPE]);
+
+			if ($value === false)
+				if (array_key_exists(PARAM_DEFAULT, $options))
+					$value = $options[PARAM_DEFAULT];
 
 			if ($value === false && $options[PARAM_IS_REQUIRED] == true)
 				returnErrorMissingHeader($header, $config);
