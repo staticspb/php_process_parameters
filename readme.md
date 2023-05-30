@@ -44,38 +44,38 @@ $ curl example/index.php?email=some@email.com&age=18&height=11.5&active=false&fe
 ## Succesfull Response Example
 ```
 {
-	"result": 200,
-	"body": {
-		"processed_parameters": {
-			"email": "some@email.com",
-			"age": 18,
-			"active": true,
-			"height": 11.5,
-			"features": [
-				"red",
-				"green",
-				"blue"
-			],
-			"config": {
-				"body": {
-					"key": "value"
-				}
-			},
-			"nonce": 0
-		},
-		"processed_headers": {
-			"Accept-Language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7,az;q=0.6",
-			"Connection": "keep-alive",
-			"Authorization": "Bearer 76d80224611fc919a5d54f0ff9fba446"
-		}
-	}
+  "result": 200,
+  "body": {
+    "processed_parameters": {
+      "email": "some@email.com",
+      "age": 18,
+      "active": true,
+      "height": 11.5,
+      "features": [
+        "red",
+        "green",
+        "blue"
+      ],
+      "config": {
+        "body": {
+          "key": "value"
+        }
+      },
+      "nonce": 0
+    },
+    "processed_headers": {
+      "Accept-Language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7,az;q=0.6",
+      "Connection": "keep-alive",
+      "Authorization": "Bearer 76d80224611fc919a5d54f0ff9fba446"
+    }
+  }
 }
 ```
 
 ## Unsuccessful Response Example
 ```
 {
-	"result": 400,
-	"error": "Wrong parameter type: email"
+  "result": 400,
+  "error": "Wrong parameter type: email"
 }
 ```
