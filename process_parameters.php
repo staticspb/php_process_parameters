@@ -308,7 +308,10 @@ function processRequestInput($config, $input, $inputType) {
 				}
 			}
 
-			$result[strtolower($parameter)] = $value;
+			if ($inputType == INPUT_PARAMETERS)
+				$result[strtolower($parameter)] = $value;
+			else
+				$result[$parameter] = $value;
 		}
 
 	} catch (Exception $e) {
