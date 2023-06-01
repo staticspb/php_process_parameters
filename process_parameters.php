@@ -1,15 +1,11 @@
 <?php
-// Suppress errors
-error_reporting(0);
-
-// Disable time limit
-set_time_limit(0);
-ini_set("memory_limit", "-1");
-
 // Load config
 include "config/index.php";
 
 // Define required variables
+define("PHP_ERROR_REPORTING", "php_error_reporting");
+define("PHP_SET_TIME_LIMIT", "php_set_time_limit");
+define("PHP_MEMORY_LIMIT", "php_memory_limit");
 define("TYPE_STRING", "string");
 define("TYPE_FLOAT", "float");
 define("TYPE_INTEGER", "integer");
@@ -30,6 +26,13 @@ define("PARAM_REGEX", "regex");
 define("PARAM_ARRAY_DELIMITER", "array_delimiter");
 define("INPUT_PARAMETERS", 0);
 define("INPUT_HEADERS", 1);
+
+// Suppress errors
+error_reporting($config[PHP_ERROR_REPORTING]);
+
+// Disable time limit
+set_time_limit($config[PHP_SET_TIME_LIMIT]);
+ini_set("memory_limit", $config[PHP_MEMORY_LIMIT]);
 
 // Add required headers to output
 function addHeader($code, $config) {

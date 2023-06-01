@@ -14,6 +14,9 @@ It automatically handles errors for defined parameters and returns JSON response
 |response_headers|n/a|Array with headers to add to response|
 |parameters|n/a|List of parameters for validation and processing|
 |headers|n/a|List of HTTP headers for validation and processing|
+|php_error_reporting|n/a|Set error reporting level|
+|php_set_time_limit|n/a|Set script execurion time limit|
+|php_memory_limit|n/a|Set script memory limit|
 
 ### Parameter and header types
 |Name|Type|Example|
