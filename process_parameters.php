@@ -173,17 +173,15 @@ function returnErrorConfiguration($name, $config, $inputType) {
 function getParam($name, $isPost = false) {
 	$result = null;
 
-	if ($isPost === false) {
-		if (isset($_GET[$name])) {
+	if ($isPost === false)
+		if (isset($_GET[$name]))
 			$result = $_GET[$name];	
-		}
-	} else {
-		if (isset($_POST[$name])) {
+	else
+		if (isset($_POST[$name]))
 			$result = $_POST[$name];	
-		}
-	}
 	
-	if (strlen($result) == 0) return false;
+	if (strlen($result) == 0) 
+		return false;
 	
 	return $result;
 }
@@ -193,11 +191,11 @@ function getHeader($name) {
 	$result = null;
 	$name = HTTP_HEADER_PREFIX . strtoupper(str_replace("-", "_", $name));
 
-	if (isset($_SERVER[$name])) {
+	if (isset($_SERVER[$name]))
 		$result = $_SERVER[$name];	
-	}
 	
-	if (strlen($result) == 0) return false;
+	if (strlen($result) == 0) 
+		return false;
 
 	return $result;
 }
@@ -342,9 +340,8 @@ function processRequestInput($config, $input, $inputType) {
 						if (array_key_exists(PARAM_MAX, $options) && intval($value[PHP_FILE_SIZE]) > intval($options[PARAM_MAX]))
 							returnErrorWrongType($parameter, $config, $inputType);
 						
-					} else {
+					} else 
 						returnErrorWrongType($parameter, $config, $inputType);
-					}
 
 					break;
 
