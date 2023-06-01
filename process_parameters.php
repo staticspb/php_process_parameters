@@ -148,7 +148,7 @@ function returnErrorConfiguration($name, $config, $inputType) {
 
 // Get request parameter by name
 function getParam($name, $isPost = false) {
-	$result = false;
+	$result = null;
 
 	if ($isPost === false) {
 		if (isset($_GET[$name])) {
@@ -167,7 +167,7 @@ function getParam($name, $isPost = false) {
 
 // Get request header by name
 function getHeader($name) {
-	$result = false;
+	$result = null;
 	$name = "HTTP_" . strtoupper(str_replace("-", "_", $name));
 
 	if (isset($_SERVER[$name])) {
@@ -198,12 +198,15 @@ function processRequestInput($config, $input, $inputType) {
 			
 			$type = strtolower($options[PARAM_TYPE]);
 
-			if ($value === false && $type != TYPE_FILE)
+			if (($value == null && $options[PARAM_IS_REQUIRED] == true) && ($inputType == INPUT_PARAMETERS && $type != TYPE_FILE))
+				returnErrorMissing($parameter, $config, $inputType);
+			
+			if ($value == null & $type != TYPE_FILE)
+				continue;
+
+			if ($type != TYPE_FILE)
 				if (array_key_exists(PARAM_DEFAULT, $options))
 					$value = $options[PARAM_DEFAULT];
-
-			if (($value === false && $options[PARAM_IS_REQUIRED] == true) && ($inputType == INPUT_PARAMETERS && $type != TYPE_FILE))
-				returnErrorMissing($parameter, $config, $inputType);
 
 			if ($inputType == INPUT_PARAMETERS && ($type == TYPE_FILE && $_SERVER["REQUEST_METHOD"] != "POST"))
 				returnErrorWrongType($parameter, $config, $inputType);
@@ -211,7 +214,7 @@ function processRequestInput($config, $input, $inputType) {
 			if ($inputType == INPUT_PARAMETERS && ($type == TYPE_FILE && $_FILES == null))
 				returnErrorMissing($parameter, $config, $inputType);
 
-			if ($value !== false && ($type == TYPE_STRING)) {
+			if ($type == TYPE_STRING) {
 				if (array_key_exists(PARAM_REGEX, $options) && preg_match($options[PARAM_REGEX], $value) == false)
 					returnErrorWrongType($parameter, $config, $inputType);
 
@@ -222,99 +225,97 @@ function processRequestInput($config, $input, $inputType) {
 					returnErrorWrongType($parameter, $config, $inputType);
 			}
 
-			if ($value !== false) {
-				switch (strtolower($type)) {
+			switch (strtolower($type)) {
+				
+				case TYPE_STRING:
+					if (array_key_exists(PARAM_REGEX, $options) && preg_match($options[PARAM_REGEX], $value) == false)
+						returnErrorWrongParameterType($parameter, $config);
+
+					if (array_key_exists(PARAM_MIN, $options) && strlen($value) < intval($options[PARAM_MIN]))
+						returnErrorWrongParameterType($parameter, $config);
+
+					if (array_key_exists(PARAM_MAX, $options) && strlen($value) > intval($options[PARAM_MAX]))
+						returnErrorWrongParameterType($parameter, $config);					
+
+					$value = strval($value);
+					break;
 					
-					case TYPE_STRING:
-						if (array_key_exists(PARAM_REGEX, $options) && preg_match($options[PARAM_REGEX], $value) == false)
-							returnErrorWrongParameterType($parameter, $config);
+				case TYPE_BOOLEAN:
+					if (!in_array(strtolower($value), VARIANTS_BOOLEAN))
+						returnErrorWrongType($parameter, $config, $inputType);
 
-						if (array_key_exists(PARAM_MIN, $options) && strlen($value) < intval($options[PARAM_MIN]))
-							returnErrorWrongParameterType($parameter, $config);
+					$value = boolval($value);
+					break;
+				
+				case TYPE_INTEGER:
+					if (!is_numeric($value))
+						returnErrorWrongType($parameter, $config, $inputType);
 
-						if (array_key_exists(PARAM_MAX, $options) && strlen($value) > intval($options[PARAM_MAX]))
-							returnErrorWrongParameterType($parameter, $config);					
+					if (array_key_exists(PARAM_MIN, $options) && intval($value) < intval($options[PARAM_MIN]))
+						returnErrorWrongType($parameter, $config, $inputType);
 
-						$value = strval($value);
-						break;
-						
-					case TYPE_BOOLEAN:
-						if (!in_array(strtolower($value), VARIANTS_BOOLEAN))
-							returnErrorWrongType($parameter, $config, $inputType);
+					if (array_key_exists(PARAM_MAX, $options) && intval($value) > intval($options[PARAM_MAX]))
+						returnErrorWrongType($parameter, $config, $inputType);
 
-						$value = boolval($value);
-						break;
+					$value = intval($value);
+					break;
+				
+				case TYPE_FLOAT:
+					if (!is_numeric($value))
+						returnErrorWrongType($parameter, $config, $inputType);
+
+					if (array_key_exists(PARAM_MIN, $options) && floatval($value) < floatval($options[PARAM_MIN]))
+						returnErrorWrongType($parameter, $config, $inputType);
+
+					if (array_key_exists(PARAM_MAX, $options) && floatval($value) > floatval($options[PARAM_MAX]))
+						returnErrorWrongType($parameter, $config, $inputType);
+
+					$value = floatval($value);
+					break;
 					
-					case TYPE_INTEGER:
-						if (!is_numeric($value))
-							returnErrorWrongType($parameter, $config, $inputType);
-
-						if (array_key_exists(PARAM_MIN, $options) && intval($value) < intval($options[PARAM_MIN]))
-							returnErrorWrongType($parameter, $config, $inputType);
-
-						if (array_key_exists(PARAM_MAX, $options) && intval($value) > intval($options[PARAM_MAX]))
-							returnErrorWrongType($parameter, $config, $inputType);
-
-						$value = intval($value);
-						break;
+				case TYPE_ARRAY:
+					$count = count(explode($config[PARAM_ARRAY_DELIMITER], $value));
 					
-					case TYPE_FLOAT:
-						if (!is_numeric($value))
-							returnErrorWrongType($parameter, $config, $inputType);
-
-						if (array_key_exists(PARAM_MIN, $options) && floatval($value) < floatval($options[PARAM_MIN]))
-							returnErrorWrongType($parameter, $config, $inputType);
-
-						if (array_key_exists(PARAM_MAX, $options) && floatval($value) > floatval($options[PARAM_MAX]))
-							returnErrorWrongType($parameter, $config, $inputType);
-
-						$value = floatval($value);
-						break;
+					if ($count == 0)
+						returnErrorWrongType($parameter, $config, $inputType);
+					
+					if (array_key_exists(PARAM_MIN, $options) && $count < intval($options[PARAM_MIN]))
+						returnErrorWrongType($parameter, $config, $inputType);
 						
-					case TYPE_ARRAY:
-						$count = count(explode($config[PARAM_ARRAY_DELIMITER], $value));
-						
-						if ($count == 0)
-							returnErrorWrongType($parameter, $config, $inputType);
-						
-						if (array_key_exists(PARAM_MIN, $options) && $count < intval($options[PARAM_MIN]))
-							returnErrorWrongType($parameter, $config, $inputType);
-							
-						
-						if (array_key_exists(PARAM_MAX, $options) && $count > intval($options[PARAM_MAX]))
-							returnErrorWrongType($parameter, $config, $inputType);
-						
-						$array = explode($config[PARAM_ARRAY_DELIMITER], $value);
-						
-						if (array_key_exists(PARAM_REGEX, $options)) {
-							for ($i=0; $i<count($array); $i++) {
-								if (preg_match($options[PARAM_REGEX], $array[$i]) == false)
-									returnErrorWrongParameterType($parameter, $config);
-							}
+					
+					if (array_key_exists(PARAM_MAX, $options) && $count > intval($options[PARAM_MAX]))
+						returnErrorWrongType($parameter, $config, $inputType);
+					
+					$array = explode($config[PARAM_ARRAY_DELIMITER], $value);
+					
+					if (array_key_exists(PARAM_REGEX, $options)) {
+						for ($i=0; $i<count($array); $i++) {
+							if (preg_match($options[PARAM_REGEX], $array[$i]) == false)
+								returnErrorWrongParameterType($parameter, $config);
 						}
-						
-						$value = $array;
-						break;
-						
-					case TYPE_JSON:
-						if (!isJson(strtolower($value)))
-							returnErrorWrongType($parameter, $config, $inputType);
-						else
-							$value = json_decode($value);
+					}
+					
+					$value = $array;
+					break;
+					
+				case TYPE_JSON:
+					if (!isJson(strtolower($value)))
+						returnErrorWrongType($parameter, $config, $inputType);
+					else
+						$value = json_decode($value);
 
-						break;
-						
-					case TYPE_FILE:
-						if ($inputType != INPUT_PARAMETERS)
-							returnErrorWrongType($parameter, $config, $inputType);
-						else
-							$value = $_FILES[$parameter];
+					break;
+					
+				case TYPE_FILE:
+					if ($inputType != INPUT_PARAMETERS)
+						returnErrorWrongType($parameter, $config, $inputType);
+					else
+						$value = $_FILES[$parameter];
 
-						break;
+					break;
 
-					default:
-						returnErrorWrongConfiguration($parameter, $config, $inputType);
-				}
+				default:
+					returnErrorWrongConfiguration($parameter, $config, $inputType);
 			}
 
 			if ($inputType == INPUT_PARAMETERS)

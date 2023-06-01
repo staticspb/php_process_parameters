@@ -2,8 +2,9 @@
 include "../process_parameters.php";
 
 try {
-	// Render response
+	// Process request data
 	$requestData = processRequest($config);
+	// Render response
 	returnResult($requestData, $config);
 
 } catch (Exception $e) {
