@@ -3,9 +3,17 @@
 include "config/index.php";
 
 // Define required variables
+define("HTTP_HEADER_PREFIX", "HTTP_");
+
 define("PHP_ERROR_REPORTING", "php_error_reporting");
 define("PHP_SET_TIME_LIMIT", "php_set_time_limit");
 define("PHP_MEMORY_LIMIT", "php_memory_limit");
+define("PHP_INI_MEMORY_LIMIT", "memory_limit");
+define("PHP_REQUEST_METHOD", "REQUEST_METHOD");
+define("PHP_REQUEST_POST", "POST");
+define("PHP_FILE_NAME", "name");
+define("PHP_FILE_SIZE", "size");
+
 define("TYPE_STRING", "string");
 define("TYPE_FLOAT", "float");
 define("TYPE_INTEGER", "integer");
@@ -13,7 +21,14 @@ define("TYPE_BOOLEAN", "boolean");
 define("TYPE_ARRAY", "array");
 define("TYPE_JSON", "json");
 define("TYPE_FILE", "file");
+
 define("VARIANTS_BOOLEAN", ["true", "false"]);
+
+define("PARAM_RESPONSE_PARAMETERS", "response_parameters");
+define("PARAM_RESPONSE_HEADERS", "response_headers");
+define("PARAM_RESULT_CODE_ROOT", "result_code_root");
+define("PARAM_SUCCESSFUL_RESPONSE_ROOT", "successful_response_root");
+define("PARAM_ERROR_RESPONSE_ROOT", "error_response_root");
 define("PARAM_PARAMETERS", "parameters");
 define("PARAM_HEADERS", "headers");
 define("PARAM_USE_POST", "use_post_method");
@@ -24,81 +39,86 @@ define("PARAM_MIN", "min");
 define("PARAM_MAX", "max");
 define("PARAM_REGEX", "regex");
 define("PARAM_ARRAY_DELIMITER", "array_delimiter");
+
 define("INPUT_PARAMETERS", 0);
 define("INPUT_HEADERS", 1);
+
+define("HTTP_RESPONSE_200", 200);
+define("HTTP_ERROR_400", 400);
+define("HTTP_ERROR_500", 500);
 
 // Suppress errors
 error_reporting($config[PHP_ERROR_REPORTING]);
 
 // Disable time limit
 set_time_limit($config[PHP_SET_TIME_LIMIT]);
-ini_set("memory_limit", $config[PHP_MEMORY_LIMIT]);
+ini_set(PHP_INI_MEMORY_LIMIT, $config[PHP_MEMORY_LIMIT]);
 
 // Add required headers to output
 function addHeader($code, $config) {
 	http_response_code($code);
-	for ($i=0; $i<count($config["response_headers"]); $i++) {
-		header($config["response_headers"][$i]);
+	for ($i=0; $i<count($config[PARAM_RESPONSE_HEADERS]); $i++) {
+		header($config[PARAM_RESPONSE_HEADERS][$i]);
 	}
 }
 
 // Render response
 function renderResponse($code, $rootName, $rootValue, $config) {
 	addHeader($code, $config);
-
-	echo json_encode(
-		array(
-			$config["result_code_root"] => $code,
-			"$rootName" => $rootValue
-		)
-	);
+	
+	$response = [
+		$config[PARAM_RESULT_CODE_ROOT] => $code,
+		"$rootName" => $rootValue
+	];
+	
+	echo json_encode($response);
 	
 	exit;
 }
 
 // Render result
 function returnResult($body, $config) {
-	renderResponse(200, $config["successful_response_root"], $body, $config);
+	renderResponse(HTTP_RESPONSE_200, $config[PARAM_SUCCESSFUL_RESPONSE_ROOT], $body, $config);
 }
 
 // Render error with code and message
 function returnError($code, $message, $config) {
-	renderResponse($code, $config["error_response_root"], $message, $config);
+	renderResponse($code, $config[PARAM_ERROR_RESPONSE_ROOT], $message, $config);
 }
 
 // Render missing parameter error
 function returnErrorMissingParameter($parameter, $config) {
-	returnError(400, "Missing parameter: $parameter", $config);
+	returnError(HTTP_ERROR_400, "Missing parameter: $parameter", $config);
 }
 
 // Render wrong parameter type error
 function returnErrorWrongParameterType($parameter, $config) {
-	returnError(400, "Wrong parameter type: $parameter", $config);
+	returnError(HTTP_ERROR_400, "Wrong parameter type: $parameter", $config);
 }
 
 // Render wrong parameter configuration error
 function returnErrorWrongParameterConfiguration($parameter, $config) {
-	returnError(400, "Wrong parameter configuration: $parameter", $config);
+	returnError(HTTP_ERROR_400, "Wrong parameter configuration: $parameter", $config);
 }
 
 // Render missing header error
 function returnErrorMissingHeader($header, $config) {
-	returnError(400, "Missing header: $header", $config);
+	returnError(HTTP_ERROR_400, "Missing header: $header", $config);
 }
 
 // Render wrong header type error
 function returnErrorWrongHeaderType($header, $config) {
-	returnError(400, "Wrong header type: $header", $config);
+	returnError(HTTP_ERROR_400, "Wrong header type: $header", $config);
 }
 
 // Render wrong header configuration error
 function returnErrorWrongHeaderConfiguration($header, $config) {
-	returnError(400, "Wrong header configuration: $header", $config);
+	returnError(HTTP_ERROR_400, "Wrong header configuration: $header", $config);
 }
 
 // Render internal server error
 function returnInternalServerError($config) {
-	returnError(500, "Internal server error", $config);
+	returnError(HTTP_ERROR_500, "Internal server error", $config);
 }
 
 // Render wrong type error for input type
@@ -171,7 +191,7 @@ function getParam($name, $isPost = false) {
 // Get request header by name
 function getHeader($name) {
 	$result = null;
-	$name = "HTTP_" . strtoupper(str_replace("-", "_", $name));
+	$name = HTTP_HEADER_PREFIX . strtoupper(str_replace("-", "_", $name));
 
 	if (isset($_SERVER[$name])) {
 		$result = $_SERVER[$name];	
@@ -190,7 +210,7 @@ function isJson($string) {
 
 // Process parameters or headers
 function processRequestInput($config, $input, $inputType) {
-	$result;
+	$result = [];
 	
 	try {
 		foreach ($input as $parameter=>$options) {
@@ -211,7 +231,7 @@ function processRequestInput($config, $input, $inputType) {
 				if (array_key_exists(PARAM_DEFAULT, $options))
 					$value = $options[PARAM_DEFAULT];
 
-			if ($inputType == INPUT_PARAMETERS && ($type == TYPE_FILE && $_SERVER["REQUEST_METHOD"] != "POST"))
+			if ($inputType == INPUT_PARAMETERS && ($type == TYPE_FILE && $_SERVER[PHP_REQUEST_METHOD] != PHP_METHOD_POST))
 				returnErrorWrongType($parameter, $config, $inputType);
 
 			if ($inputType == INPUT_PARAMETERS && ($type == TYPE_FILE && $_FILES == null))
@@ -310,10 +330,21 @@ function processRequestInput($config, $input, $inputType) {
 					break;
 					
 				case TYPE_FILE:
-					if ($inputType != INPUT_PARAMETERS)
-						returnErrorWrongType($parameter, $config, $inputType);
-					else
+					if ($inputType == INPUT_PARAMETERS) {
 						$value = $_FILES[$parameter];
+						
+						if (array_key_exists(PARAM_REGEX, $options) && preg_match($options[PARAM_REGEX], $value[PHP_FILE_NAME]) == false)
+							returnErrorWrongParameterType($parameter, $config);
+
+						if (array_key_exists(PARAM_MIN, $options) && intval($value[PHP_FILE_SIZE]) < intval($options[PARAM_MIN]))
+							returnErrorWrongType($parameter, $config, $inputType);
+
+						if (array_key_exists(PARAM_MAX, $options) && intval($value[PHP_FILE_SIZE]) > intval($options[PARAM_MAX]))
+							returnErrorWrongType($parameter, $config, $inputType);
+						
+					} else {
+						returnErrorWrongType($parameter, $config, $inputType);
+					}
 
 					break;
 

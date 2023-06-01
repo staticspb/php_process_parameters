@@ -27,16 +27,16 @@ It automatically handles errors for defined parameters and returns JSON response
 |boolean|Boolean|true|
 |array|Array|one,two,three|
 |json|JSON|{"foo": "bar"}|
-|file|File|... **Only for "POST" requests**|
+|file|File|**Only for "POST" requests**|
 
 ### Available options for parameters and hearers
 |Name|Type|Description|
 |---|---|---|
 |is_required|Boolean|Creates a required parameter
 |default|Any Type|Set default value for parameter or header
-|min|Integer or Float|Minimal value for Integer or Float types, minimal string length for String type or array length for Array type|
-|max|Integer or Float|Maximal value for Integer or Float types, maximal string length for String type or array length for Array type|
-|regex|String or Array|RegEx expressions to validate parameter value of string or each item in array
+|min|Integer or Float|Minimal value for Integer or Float types, minimal string length for String type, array length for Array type or file size for File type|
+|max|Integer or Float|Maximal value for Integer or Float types, maximal string length for String type, array length for Array type or file size for File type|
+|regex|String, Array or File|RegEx expressions to validate parameter value of string, each item in array or file name
 
 
 ## cURL Example
