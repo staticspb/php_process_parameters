@@ -178,12 +178,12 @@ function processRequestInput($config, $input, $inputType) {
 			if (($value == null && $options[PARAM_IS_REQUIRED] == true) && ($inputType == INPUT_PARAMETERS && $type != TYPE_FILE))
 				returnErrorMissing($parameter, $config, $inputType);
 			
+			if ($type != TYPE_FILE)
+				if ($value == null && array_key_exists(PARAM_DEFAULT, $options))
+					$value = $options[PARAM_DEFAULT];
+
 			if ($value == null & $type != TYPE_FILE)
 				continue;
-
-			if ($type != TYPE_FILE)
-				if (array_key_exists(PARAM_DEFAULT, $options))
-					$value = $options[PARAM_DEFAULT];
 
 			if ($inputType == INPUT_PARAMETERS && ($type == TYPE_FILE && $_SERVER[PHP_REQUEST_METHOD] != PHP_METHOD_POST))
 				returnErrorWrongType($parameter, $config, $inputType);
@@ -251,7 +251,11 @@ function processRequestInput($config, $input, $inputType) {
 					break;
 					
 				case TYPE_ARRAY:
-					$count = count(explode($config[PARAM_ARRAY_DELIMITER], $value));
+					$arrayDelimiter = $config[PARAM_ARRAY_DELIMITER];
+					if (array_key_exists(PARAM_ARRAY_DELIMITER, $options))
+						$arrayDelimiter = $options[PARAM_ARRAY_DELIMITER];
+
+					$count = count(explode($arrayDelimiter, $value));
 					
 					if ($count == 0)
 						returnErrorWrongType($parameter, $config, $inputType);
@@ -263,7 +267,7 @@ function processRequestInput($config, $input, $inputType) {
 					if (array_key_exists(PARAM_MAX, $options) && $count > intval($options[PARAM_MAX]))
 						returnErrorWrongType($parameter, $config, $inputType);
 					
-					$array = explode($config[PARAM_ARRAY_DELIMITER], $value);
+					$array = explode($arrayDelimiter, $value);
 					
 					if (array_key_exists(PARAM_REGEX, $options)) {
 						for ($i=0; $i<count($array); $i++) {
