@@ -3,8 +3,6 @@
 include "config/index.php";
 
 // Define required variables
-define("HTTP_HEADER_PREFIX", "HTTP_");
-
 define("PHP_ERROR_REPORTING", "php_error_reporting");
 define("PHP_SET_TIME_LIMIT", "php_set_time_limit");
 define("PHP_MEMORY_LIMIT", "php_memory_limit");
@@ -43,12 +41,13 @@ define("PARAM_ARRAY_DELIMITER", "array_delimiter");
 define("INPUT_PARAMETERS", 0);
 define("INPUT_HEADERS", 1);
 
+define("HTTP_HEADER_PREFIX", "HTTP_");
 define("HTTP_RESPONSE_200", 200);
 define("HTTP_ERROR_400", 400);
 define("HTTP_ERROR_500", 500);
 
 // Suppress errors
-error_reporting($config[PHP_ERROR_REPORTING]);
+//error_reporting($config[PHP_ERROR_REPORTING]);
 
 // Disable time limit
 set_time_limit($config[PHP_SET_TIME_LIMIT]);
@@ -252,13 +251,13 @@ function processRequestInput($config, $input, $inputType) {
 				
 				case TYPE_STRING:
 					if (array_key_exists(PARAM_REGEX, $options) && preg_match($options[PARAM_REGEX], $value) == false)
-						returnErrorWrongParameterType($parameter, $config);
+						returnErrorWrongType($parameter, $config);
 
 					if (array_key_exists(PARAM_MIN, $options) && strlen($value) < intval($options[PARAM_MIN]))
-						returnErrorWrongParameterType($parameter, $config);
+						returnErrorWrongType($parameter, $config);
 
 					if (array_key_exists(PARAM_MAX, $options) && strlen($value) > intval($options[PARAM_MAX]))
-						returnErrorWrongParameterType($parameter, $config);					
+						returnErrorWrongType($parameter, $config);					
 
 					$value = strval($value);
 					break;
@@ -314,7 +313,7 @@ function processRequestInput($config, $input, $inputType) {
 					if (array_key_exists(PARAM_REGEX, $options)) {
 						for ($i=0; $i<count($array); $i++) {
 							if (preg_match($options[PARAM_REGEX], $array[$i]) == false)
-								returnErrorWrongParameterType($parameter, $config);
+								returnErrorWrongType($parameter, $config);
 						}
 					}
 					
@@ -334,7 +333,7 @@ function processRequestInput($config, $input, $inputType) {
 						$value = $_FILES[$parameter];
 						
 						if (array_key_exists(PARAM_REGEX, $options) && preg_match($options[PARAM_REGEX], $value[PHP_FILE_NAME]) == false)
-							returnErrorWrongParameterType($parameter, $config);
+							returnErrorWrongType($parameter, $config);
 
 						if (array_key_exists(PARAM_MIN, $options) && intval($value[PHP_FILE_SIZE]) < intval($options[PARAM_MIN]))
 							returnErrorWrongType($parameter, $config, $inputType);
@@ -349,7 +348,7 @@ function processRequestInput($config, $input, $inputType) {
 					break;
 
 				default:
-					returnErrorWrongConfiguration($parameter, $config, $inputType);
+					returnErrorConfiguration($parameter, $config, $inputType);
 			}
 
 			if ($inputType == INPUT_PARAMETERS)
