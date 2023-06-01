@@ -11,7 +11,9 @@ It automatically handles errors for defined parameters and returns JSON response
 |error_response_root|error|Root data element for error response|
 |array_delimiter|,|Array delimiter for parameters|
 |use_post_method|false|Set to "true" to use POST request method|
-|response_headers|n/a|Array with headers to add to response|
+|response_parameters|parameters|Processed parameters root data element|
+|response_headers|headers|Processed headers root data element|
+|response_add_headers|n/a|Array with headers to add to response|
 |parameters|n/a|List of parameters for validation and processing|
 |headers|n/a|List of HTTP headers for validation and processing|
 |php_error_reporting|n/a|Set error reporting level|

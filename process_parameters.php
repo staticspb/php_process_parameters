@@ -24,6 +24,7 @@ define("VARIANTS_BOOLEAN", ["true", "false"]);
 
 define("PARAM_RESPONSE_PARAMETERS", "response_parameters");
 define("PARAM_RESPONSE_HEADERS", "response_headers");
+define("PARAM_RESPONSE_ADD_HEADERS", "response_add_headers");
 define("PARAM_RESULT_CODE_ROOT", "result_code_root");
 define("PARAM_SUCCESSFUL_RESPONSE_ROOT", "successful_response_root");
 define("PARAM_ERROR_RESPONSE_ROOT", "error_response_root");
@@ -56,8 +57,8 @@ ini_set(PHP_INI_MEMORY_LIMIT, $config[PHP_MEMORY_LIMIT]);
 // Add required headers to output
 function addHeader($code, $config) {
 	http_response_code($code);
-	for ($i=0; $i<count($config[PARAM_RESPONSE_HEADERS]); $i++) {
-		header($config[PARAM_RESPONSE_HEADERS][$i]);
+	for ($i=0; $i<count($config[PARAM_RESPONSE_ADD_HEADERS]); $i++) {
+		header($config[PARAM_RESPONSE_ADD_HEADERS][$i]);
 	}
 }
 
@@ -366,8 +367,9 @@ function processRequestInput($config, $input, $inputType) {
 
 // Process both parameters and headers
 function processRequest($config) {
-	$parameters = processRequestInput($config, $config[PARAM_PARAMETERS], INPUT_PARAMETERS);
-	$headers = processRequestInput($config, $config[PARAM_HEADERS], INPUT_HEADERS);
-	return ["parameters" => $parameters, "headers" => $headers];
+	return [
+		$config[PARAM_RESPONSE_PARAMETERS] => processRequestInput($config, $config[PARAM_PARAMETERS], INPUT_PARAMETERS), 
+		$config[PARAM_RESPONSE_HEADERS] => processRequestInput($config, $config[PARAM_HEADERS], INPUT_HEADERS)
+	];
 }
 ?>

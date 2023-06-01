@@ -9,7 +9,10 @@ $config = array(
 	"php_set_time_limit" => 0,					/* Set script execurion time limit */
 	"php_memory_limit" => "-1",					/* Set script memory limit */
 	
-	"response_headers" => [	/* Array with headers to add to response */
+	"response_parameters" => "parameters",		/* Processed parameters root data element */
+	"response_headers" => "headers",			/* Processed headers root data element */
+	
+	"response_add_headers" => [					/* Array with headers to add to response */
 		"Content-Type: application/json",
 		"Access-Control-Allow-Origin: *",
 		"Access-Control-Allow-Methods: GET",
