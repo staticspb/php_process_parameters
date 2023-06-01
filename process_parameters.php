@@ -255,7 +255,7 @@ function processRequestInput($config, $input, $inputType) {
 						if (array_key_exists(PARAM_MAX, $options) && intval($value) > intval($options[PARAM_MAX]))
 							returnErrorWrongType($parameter, $config, $inputType);
 
-						$value = boolval($value);
+						$value = intval($value);
 						break;
 					
 					case TYPE_FLOAT:
@@ -283,8 +283,17 @@ function processRequestInput($config, $input, $inputType) {
 						
 						if (array_key_exists(PARAM_MAX, $options) && $count > intval($options[PARAM_MAX]))
 							returnErrorWrongType($parameter, $config, $inputType);
-
-						$value = explode($config[PARAM_ARRAY_DELIMITER], $value);
+						
+						$array = explode($config[PARAM_ARRAY_DELIMITER], $value);
+						
+						if (array_key_exists(PARAM_REGEX, $options)) {
+							for ($i=0; $i<count($array); $i++) {
+								if (preg_match($options[PARAM_REGEX], $array[$i]) == false)
+									returnErrorWrongParameterType($parameter, $config);
+							}
+						}
+						
+						$value = $array;
 						break;
 						
 					case TYPE_JSON:
